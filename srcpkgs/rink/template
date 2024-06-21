@@ -1,10 +1,10 @@
 # Template file for 'rink'
 pkgname=rink
 version=0.8.0
-revision=1
+revision=2
 build_style=cargo
-make_install_args="--path cli"
-hostmakedepends="pkg-config"
+make_install_args="--path cli --no-default-features"
+hostmakedepends="pkg-config ruby-asciidoctor"
 makedepends="openssl-devel"
 short_desc="Unit-aware calculator and conversion tool"
 maintainer="Orphaned <orphan@voidlinux.org>"
@@ -18,3 +18,21 @@ case "$XBPS_TARGET_MACHINE" in
 	ppc64le*) ;;
 	ppc64*) broken="lots of unresolved imports for some reason";;
 esac
+
+export RINK_PATH=/usr/share/rink
+
+post_build() {
+	make man prefix=/usr
+}
+
+post_install() {
+	vmkdir usr/share/rink
+	vinstall core/definitions.units 0644 usr/share/rink
+	vinstall core/datepatterns.txt 0644 usr/share/rink
+	vinstall core/currency.units 0644 usr/share/rink
+	vman build/rink.1
+	vman build/rink.5
+	vman build/rink.7
+	vman build/rink-dates.5
+	vman build/rink-defs.5
+}
